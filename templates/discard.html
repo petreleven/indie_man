@@ -1,0 +1,511 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>Gnome</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script
+      src="https://unpkg.com/htmx.org@1.9.10"
+      integrity="sha384-D1Kt99CQMDuVetoL1lrYwg5t+9QdHe7NLX/SoJYkXDFfX37iInKRy5xLSi8nO7UC"
+      crossorigin="anonymous"
+    ></script>
+    <link href="../static/css/output.css" rel="stylesheet" />
+    <script
+      src="https://kit.fontawesome.com/be2e2c9846.js"
+      crossorigin="anonymous"
+    ></script>
+
+    <script src="../static/js/browserpreferences.js"></script>
+    <script src="../static/js/menutoggle.js" defer></script>
+
+    <!--DEFERED-->
+    <script src="../static/js/flowbite.js" defer></script>
+    <script src="../static/js/tooglemode.js" defer></script>
+    <script
+      defer
+      src="https://unpkg.com/alpinejs@3.2.3/dist/cdn.min.js"
+    ></script>
+    <script src="../static/js/faqs.js" defer></script>
+    <script src="../static/js/sidebar.js" defer></script>
+  </head>
+
+  <body
+    class="bg-background-50 dark:bg-background-950 max-w-[2000px] container"
+    id="body"
+  >
+    <div
+      class="w-full backdrop-blur-md pr-4 border-b-[0.1px] border-primary-800 py-4 bg-background-900 shadow-xl"
+    >
+      <nav class="mx-auto px-5 py-2 h-10">
+        <div class="container mx-auto items-center justify-between">
+          <a
+            href="#"
+            aria-label="HomePage"
+            class="focus:outline-none focus-visible:ring-2 ring-[#f3bce6] rounded-sm ring-offset-2 ring-offset-[#f3bce6] lg:absolute lg:left-1/2 lg:-translate-x-1/2 lg:top-8 z-50 hover:opacity:75 transition-opacity text-neutral-200 font-bold italic lg:text-2xl"
+          >
+            GNOME
+          </a>
+          <button
+            id="menu"
+            class="lg:hidden focus:outline-none focus-visible:ring-2 ring-[#f3bce6] rounded-sm ring-offset-2 ring-offset-[#f3bce6] text-neutral-400 hover:text-[#f3bce6] transition-colors absolute right-12"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke-width="1.5"
+              stroke="currentColor"
+              class="w-8 h-8"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M3.75 9h16.5m-16.5 6.75h16.5"
+              />
+            </svg>
+          </button>
+
+          <div
+            role="menubar"
+            id="menubar"
+            class="hidden flex flex-col gap-3 absolute left-0 right-0 top-16 bg-background-900 lg:bg-transparent text-center p-6 lg:flex lg:flex-row lg:justify-between lg:static lg:w-full lg:p-0 lg:shadow-none transiton-all  z-40 pb-2"
+          >
+            <a
+              role="menuitem"
+              class="py-2 px-5 text-neutral-200 hover:text-[#f3bce6] transition-colors"
+              href="#"
+              >Home</a
+            >
+            <a
+              role="menuitem"
+              class="py-2 px-5 text-neutral-200 hover:text-[#f3bce6] transition-colors lg:mr-auto"
+              href="#"
+              >Contact</a
+            >
+            <div class="py-2 px-5 hidden lg:block">
+              <div>
+                <form class="flex items-center">
+                  <label for="simple-search" class="sr-only">Search</label>
+                  <div class="relative w-full">
+                    <div
+                      class="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none"
+                    >
+                      <svg
+                        class="w-4 h-4 text-gray-500 dark:text-gray-400"
+                        aria-hidden="true"
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 18 20"
+                      >
+                        <path
+                          stroke="currentColor"
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          stroke-width="2"
+                          d="M3 5v10M3 5a2 2 0 1 0 0-4 2 2 0 0 0 0 4Zm0 10a2 2 0 1 0 0 4 2 2 0 0 0 0-4Zm12 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4Zm0 0V6a3 3 0 0 0-3-3H9m1.5-2-2 2 2 2"
+                        />
+                      </svg>
+                    </div>
+                    <input
+                      type="text"
+                      id="simple-search"
+                      class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full ps-10 p-2.5 dark:bg-neutral-300 dark:border-gray-600 dark:placeholder-gray-700 dark:text-neutral-800 dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                      placeholder="Search streamer or genre..."
+                      required
+                    />
+                  </div>
+
+                  <button
+                    type="submit"
+                    class="p-2.5 ms-2 text-sm font-medium text-white bg-primary-700 rounded-lg hover:bg-primary-600"
+                  >
+                    <svg
+                      class="w-4 h-4"
+                      aria-hidden="true"
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 20 20"
+                    >
+                      <path
+                        stroke="currentColor"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z"
+                      />
+                    </svg>
+                    <span class="sr-only">Search</span>
+                  </button>
+                </form>
+              </div>
+            </div>
+            <a
+              href="#"
+              class="text-white bg-transparent hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-purple-300 dark:focus:ring-purple-800 font-medium rounded-lg text-sm px-5 py-2.5 text-center me-2 mb-2 border hover:bg-gray-600"
+            >
+              Log In
+            </a>
+            <a
+              href="#"
+              class="text-white bg-gradient-to-r from-purple-500 via-purple-600 to-purple-700 hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-purple-300 dark:focus:ring-purple-800 font-medium rounded-lg text-sm px-5 py-2.5 text-center me-2 mb-2"
+            >
+              Sign Up
+            </a>
+          </div>
+        </div>
+      </nav>
+    </div>
+    <button
+      data-drawer-target="default-sidebar"
+      data-drawer-toggle="default-sidebar"
+      aria-controls="default-sidebar"
+      type="button"
+      class="fixed inline-flex items-center p-2 mt-[0.5rem] ms-[1.25rem] text-sm text-neutral-200 rounded-lg hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-200 dark:text-gray-400 dark:hover:bg-gray-700 dark:focus:ring-gray-600 z-10"
+    >
+      <span class="sr-only">Open sidebar</span>
+      <svg
+        class="w-6 h-6"
+        aria-hidden="true"
+        fill="currentColor"
+        viewBox="0 0 20 20"
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        <path
+          clip-rule="evenodd"
+          fill-rule="evenodd"
+          d="M2 4.75A.75.75 0 012.75 4h14.5a.75.75 0 010 1.5H2.75A.75.75 0 012 4.75zm0 10.5a.75.75 0 01.75-.75h7.5a.75.75 0 010 1.5h-7.5a.75.75 0 01-.75-.75zM2 10a.75.75 0 01.75-.75h14.5a.75.75 0 010 1.5H2.75A.75.75 0 012 10z"
+        ></path>
+      </svg>
+    </button>
+    <aside
+      id="default-sidebar"
+      class="fixed top-0 left-0 z-40 w-64 h-screen transition-transform -translate-x-full sm:translate-x-0 max-w-64"
+      aria-label="Sidebar"
+      
+    >
+      <div class="h-full px-3 py-4 overflow-y-auto bg-background-900">
+        <ul class="space-y-2 mt-8 pt-8">
+          <li class="mt-8">
+            <span class="ms-3 text-accent-500 font-bold text-lg ">Platform</span>
+            <div
+              class="flex flex-row text-sm lg:text-base flex-wrap place-items-center"
+            >
+              <a
+                class="text-neutral-50/60 hover:text-teal-300 px-4 py-1 hover:underline hover:decoration-teal-300 underline-offset-2 cursor-pointer w-1/2"
+                ><i class="fa-brands fa-twitch"></i> Twitch</a
+              >
+              <a
+                class="text-neutral-50/60 hover:text-teal-300 px-4 py-1 hover:underline hover:decoration-teal-300 underline-offset-2 cursor-pointer w-1/2"
+                ><i class="fa-brands fa-youtube"></i> Youtube</a
+              >
+            </div>
+          </li>
+          <li>
+            <span class="ms-3 text-accent-500 font-bold text-lg"
+              >Genres Played</span
+            >
+            <div
+              class="flex flex-row text-sm lg:text-base flex-wrap place-items-center"
+            >
+              <a
+                class="text-neutral-50/60 hover:text-teal-300 px-4 py-1 hover:underline hover:decoration-teal-300 underline-offset-2 cursor-pointer w-1/2"
+              >
+                Roguelike
+              </a>
+              <a
+                class="text-neutral-50/60 hover:text-teal-300 px-4 py-1 hover:underline hover:decoration-teal-300 underline-offset-2 cursor-pointer w-1/2"
+              >
+                Strategy
+              </a>
+              <a
+                class="text-neutral-50/60 hover:text-teal-300 px-4 py-1 hover:underline hover:decoration-teal-300 underline-offset-2 cursor-pointer w-1/2"
+              >
+                Fps
+              </a>
+              <a
+                class="text-neutral-50/60 hover:text-teal-300 px-4 py-2 hover:underline hover:decoration-teal-300 underline-offset-2 cursor-pointer w-1/2"
+              >
+                Simulation
+              </a>
+              <a
+                class="text-neutral-50/60 hover:text-teal-300 px-4 py-2 hover:underline hover:decoration-teal-300 underline-offset-2 cursor-pointer w-1/2"
+              >
+                RPG
+              </a>
+              <a
+                class="text-neutral-50/60 hover:text-teal-300 px-4 py-2 hover:underline hover:decoration-teal-300 underline-offset-2 cursor-pointer w-1/2"
+              >
+                Shooter
+              </a>
+              <a
+                class="text-neutral-50/60 hover:text-teal-300 px-4 py-2 hover:underline hover:decoration-teal-300 underline-offset-2 cursor-pointer w-1/2"
+              >
+                Survival
+              </a>
+              <a
+                class="text-neutral-50/60 hover:text-teal-300 px-4 py-2 hover:underline hover:decoration-teal-300 underline-offset-2 cursor-pointer w-1/2"
+              >
+                Puzzle
+              </a>
+            </div>
+          </li>
+          <li>
+            <a
+              href="#"
+              class="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group"
+            >
+              <svg
+                class="flex-shrink-0 w-5 h-5 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white"
+                aria-hidden="true"
+                xmlns="http://www.w3.org/2000/svg"
+                fill="currentColor"
+                viewBox="0 0 20 20"
+              >
+                <path
+                  d="m17.418 3.623-.018-.008a6.713 6.713 0 0 0-2.4-.569V2h1a1 1 0 1 0 0-2h-2a1 1 0 0 0-1 1v2H9.89A6.977 6.977 0 0 1 12 8v5h-2V8A5 5 0 1 0 0 8v6a1 1 0 0 0 1 1h8v4a1 1 0 0 0 1 1h2a1 1 0 0 0 1-1v-4h6a1 1 0 0 0 1-1V8a5 5 0 0 0-2.582-4.377ZM6 12H4a1 1 0 0 1 0-2h2a1 1 0 0 1 0 2Z"
+                />
+              </svg>
+              <span class="flex-1 ms-3 whitespace-nowrap">Inbox</span>
+              <span
+                class="inline-flex items-center justify-center w-3 h-3 p-3 ms-3 text-sm font-medium text-blue-800 bg-blue-100 rounded-full dark:bg-blue-900 dark:text-blue-300"
+                >3</span
+              >
+            </a>
+          </li>
+          <li>
+            <a
+              href="#"
+              class="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group"
+            >
+              <svg
+                class="flex-shrink-0 w-5 h-5 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white"
+                aria-hidden="true"
+                xmlns="http://www.w3.org/2000/svg"
+                fill="currentColor"
+                viewBox="0 0 20 18"
+              >
+                <path
+                  d="M14 2a3.963 3.963 0 0 0-1.4.267 6.439 6.439 0 0 1-1.331 6.638A4 4 0 1 0 14 2Zm1 9h-1.264A6.957 6.957 0 0 1 15 15v2a2.97 2.97 0 0 1-.184 1H19a1 1 0 0 0 1-1v-1a5.006 5.006 0 0 0-5-5ZM6.5 9a4.5 4.5 0 1 0 0-9 4.5 4.5 0 0 0 0 9ZM8 10H5a5.006 5.006 0 0 0-5 5v2a1 1 0 0 0 1 1h11a1 1 0 0 0 1-1v-2a5.006 5.006 0 0 0-5-5Z"
+                />
+              </svg>
+              <span class="flex-1 ms-3 whitespace-nowrap">Users</span>
+            </a>
+          </li>
+          <li>
+            <a
+              href="#"
+              class="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group"
+            >
+              <svg
+                class="flex-shrink-0 w-5 h-5 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white"
+                aria-hidden="true"
+                xmlns="http://www.w3.org/2000/svg"
+                fill="currentColor"
+                viewBox="0 0 18 20"
+              >
+                <path
+                  d="M17 5.923A1 1 0 0 0 16 5h-3V4a4 4 0 1 0-8 0v1H2a1 1 0 0 0-1 .923L.086 17.846A2 2 0 0 0 2.08 20h13.84a2 2 0 0 0 1.994-2.153L17 5.923ZM7 9a1 1 0 0 1-2 0V7h2v2Zm0-5a2 2 0 1 1 4 0v1H7V4Zm6 5a1 1 0 1 1-2 0V7h2v2Z"
+                />
+              </svg>
+              <span class="flex-1 ms-3 whitespace-nowrap">Products</span>
+            </a>
+          </li>
+          <li>
+            <a
+              href="#"
+              class="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group"
+            >
+              <svg
+                class="flex-shrink-0 w-5 h-5 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white"
+                aria-hidden="true"
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 18 16"
+              >
+                <path
+                  stroke="currentColor"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M1 8h11m0 0L8 4m4 4-4 4m4-11h3a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2h-3"
+                />
+              </svg>
+              <span class="flex-1 ms-3 whitespace-nowrap">Sign In</span>
+            </a>
+          </li>
+          <li>
+            <a
+              href="#"
+              class="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group"
+            >
+              <svg
+                class="flex-shrink-0 w-5 h-5 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white"
+                aria-hidden="true"
+                xmlns="http://www.w3.org/2000/svg"
+                fill="currentColor"
+                viewBox="0 0 20 20"
+              >
+                <path
+                  d="M5 5V.13a2.96 2.96 0 0 0-1.293.749L.879 3.707A2.96 2.96 0 0 0 .13 5H5Z"
+                />
+                <path
+                  d="M6.737 11.061a2.961 2.961 0 0 1 .81-1.515l6.117-6.116A4.839 4.839 0 0 1 16 2.141V2a1.97 1.97 0 0 0-1.933-2H7v5a2 2 0 0 1-2 2H0v11a1.969 1.969 0 0 0 1.933 2h12.134A1.97 1.97 0 0 0 16 18v-3.093l-1.546 1.546c-.413.413-.94.695-1.513.81l-3.4.679a2.947 2.947 0 0 1-1.85-.227 2.96 2.96 0 0 1-1.635-3.257l.681-3.397Z"
+                />
+                <path
+                  d="M8.961 16a.93.93 0 0 0 .189-.019l3.4-.679a.961.961 0 0 0 .49-.263l6.118-6.117a2.884 2.884 0 0 0-4.079-4.078l-6.117 6.117a.96.96 0 0 0-.263.491l-.679 3.4A.961.961 0 0 0 8.961 16Zm7.477-9.8a.958.958 0 0 1 .68-.281.961.961 0 0 1 .682 1.644l-.315.315-1.36-1.36.313-.318Zm-5.911 5.911 4.236-4.236 1.359 1.359-4.236 4.237-1.7.339.341-1.699Z"
+                />
+              </svg>
+              <span class="flex-1 ms-3 whitespace-nowrap">Sign Up</span>
+            </a>
+          </li>
+        </ul>
+      </div>
+    </aside>
+
+    <div class="p-4 lg:ml-64 pt-0 -z-10">
+      <header id="herosection" >
+        <div class="container mt-4 max-w-7xl mx-auto align-center">
+          <div class="grid grid-rows-1 gap-2 place-items-center m-8">
+            <div>
+              <h1
+                class="font-bold pt-16 text-4xl lg:text-6xl text-center mb-8 max-w-[760px] text-neutral-900 dark:text-text-50"
+              >
+                Viewing channels playing Tower Defense
+              </h1>
+            </div>
+            <p class="text-neutral-400">or</p>
+            <div class="flex flex-row gap-x-2 h-12">
+              <button
+                class="bg-primary-300 dark:bg-accent-500 border border-gray-300 text-text-50 dark:text-text-100 text-sm rounded-l-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5 pr-7 hover:bg-neutral-50 hover:text-neutral-800 transition-all"
+              >
+                View All
+              </button>
+              <button
+                class="bg-secondary-600 border border-secondary-300 text-text-50 dark:text-text-100 text-sm rounded-r-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5 hover:bg-secondary-100 dark:hover:text-secondary-600 hover:text-neutral-800"
+              >
+                Explore Filters
+              </button>
+            </div>
+          </div>
+        </div>
+      </header>
+      <main class="mt-8 container mx-auto max-w-8xl">
+        <section
+          class="grid gap-3 grid-cols-1 md:grid-cols-1 lg:grid-cols-1 xl:grid-cols-1 mx-auto place-items-center px-4 pb-4"
+        >
+          <!--TABLE-->
+          <div
+            class="relative flex flex-col min-w-0 break-words w-full mb-6 shadow-lg rounded bg-background-900 border-background-200 border-[0px]"
+          >
+            <div class="rounded-t mb-0 px-4 py-3 border-0 bg-background-800">
+              <div class="flex flex-wrap items-center">
+                <div class="relative w-full px-4 max-w-full flex-grow flex-1">
+                  <h3 class="font-semibold text-base text-text-100 text-center">
+                    Social traffic
+                  </h3>
+                </div>
+              </div>
+            </div>
+            <div class="block w-full overflow-x-auto">
+              <table
+                class="items-center w-full border-collapse text-blueGray-700"
+              >
+                <thead>
+                  <tr
+                    class="odd:bg-primary-900 odd:dark::bg-primary-900 even:bg-transparent/[0.3] even:dark:bg-transparent/[0.3] border-b dark:border-gray-700 text-neutral-200"
+                  >
+                    <th
+                      class="px-2 align-middle py-3 text-xs uppercase border-l-0 whitespace-nowrap font-semibold text-left"
+                    >
+                      Export
+                    </th>
+                    <th
+                      class="px-6 align-middle py-3 text-xs uppercase border-l-0 whitespace-nowrap font-semibold text-left"
+                    >
+                      Referral
+                    </th>
+                    <th
+                      class="px-6 align-middle py-3 text-xs uppercase border-l-0 whitespace-nowrap font-semibold text-left"
+                    >
+                      Visitors
+                    </th>
+                    <th
+                      class="px-6 align-middle py-3 text-xs uppercase border-l-0 whitespace-nowrap font-semibold text-left"
+                    >
+                      Vidcount
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for data in context.channels %}
+                  <tr
+                    class="odd:bg-primary-900/[.3] odd:dark::bg-primary-900 even:bg-gray-200 even:dark:bg-gray-900 border-b dark:border-gray-700"
+                  >
+                    <td
+                      class="border-t-0 px-2 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4 text-neutral-200"
+                    >
+                      <div class="flex items-center mb-4">
+                        <input
+                          id="default-checkbox"
+                          type="checkbox"
+                          value=""
+                          class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
+                        />
+                      </div>
+                    </td>
+                    <th
+                      class="border-t-0 px-6 align-middle border-l-0 border-r-0 text-sm whitespace-nowrap p-4 text-text-50 text-left"
+                    >
+                      <div class="flex flex-row">
+                        <img
+                          class="w-10 h-10 rounded-full"
+                          src="https://picsum.photos/200"
+                          alt="Rounded avatar"
+                        />
+                        <div class="p-2">Facebook</div>
+                      </div>
+                    </th>
+                    <td
+                      class="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4 text-neutral-200"
+                    >
+                      1,480
+                    </td>
+                    <td
+                      class="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4 text-neutral-200"
+                    >
+                      <div class="flex items-center">
+                        <span class="mr-2">60%</span>
+                        <div class="relative w-full">
+                          <div
+                            class="overflow-hidden h-2 text-xs flex rounded bg-red-200"
+                          >
+                            <div
+                              style="width: 60%"
+                              class="shadow-none flex flex-col text-center whitespace-nowrap text-white justify-center bg-red-500"
+                            ></div>
+                          </div>
+                        </div>
+                      </div>
+                    </td>
+                  </tr>
+                  {%endfor%}
+                </tbody>
+              </table>
+            </div>
+            <div class="rounded-t mb-0 px-4 py-3 border-0">
+              <div class="flex flex-wrap items-center">
+                <div class="relative w-full px-4 max-w-full flex-grow flex-1">
+                  <h3
+                    class="font-semibold text-accent-200 dark:text-text-50 text-center hover:text-teal-400 cursor-pointer"
+                  >
+                    Explore More
+                  </h3>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+      </main>
+    </div>
+  </body>
+</html>

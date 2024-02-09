@@ -1,0 +1,20 @@
+[[source]]
+url = "https://pypi.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[packages]
+quart = "*"
+requests = "*"
+google-api-python-client = "*"
+bs4 = "*"
+sqlalchemy = "*"
+asyncpg = "*"
+quart-schema = "*"
+pydantic = "*"
+python-dotenv = "*"
+
+[dev-packages]
+
+[requires]
+python_version = "3.10"
