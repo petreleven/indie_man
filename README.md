@@ -1,3 +1,1 @@
-# indie_man
-# indie_man
-# indie_man
+#A WAY FOR INDIE GAME DEVS TO FIND STREAMERS
