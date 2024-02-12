@@ -1,7 +1,8 @@
-from sqlalchemy.orm import declarative_base, relationship
+from sqlalchemy.orm import   DeclarativeBase, relationship
 from sqlalchemy import Column, String, Integer, ForeignKey, Date
-
-Base = declarative_base()
+from sqlalchemy.ext.asyncio import AsyncAttrs
+class Base(DeclarativeBase, AsyncAttrs):
+    pass
 
 
 class Genre_Streamer_Association(Base):
@@ -22,9 +23,9 @@ class Streamer(Base):
     instagram = Column(String)
     instagram_followers = Column(Integer)
     # channels
-    twitch_url = Column(String)
+    twitch_url = Column(String, nullable=True)
     twitch_subs = Column(Integer)
-    youtube_url = Column(String)
+    youtube_url = Column(String, nullable=True)
     youtube_subs = Column(Integer)
     # country
     country = Column(String)
@@ -32,27 +33,10 @@ class Streamer(Base):
         "Genre",
         secondary="genre_streamer_associations",
         back_populates="streamers",
-        lazy="selectin",
+        lazy="joined",
     )
     videos = relationship("Video", back_populates="streamer")
 
-    async def to_dict(self):
-        return {
-            "id": self.id,
-            "name": self.name,
-            "email": self.email,
-            "twitter": self.twitter,
-            "twitter_followers": self.twitter_followers,
-            "instagram": self.instagram,
-            "instagram_followers": self.instagram_followers,
-            "twitch_url": self.twitch_url,
-            "twitch_subs": self.twitch_subs,
-            "youtube_url": self.youtube_url,
-            "youtube_subs": self.youtube_subs,
-            "country": self.country,
-            # Assuming Video also has a to_dict method
-            "videos": [video.to_dict() for video in self.videos],
-        }
 
 
 class Video(Base):
@@ -63,7 +47,8 @@ class Video(Base):
     comments = Column(Integer)
     upload_date = Column(Date)
     likes = Column(Integer)
-    streamer = relationship("Streamer", back_populates="videos", lazy="selectin")
+    streamer = relationship(
+        "Streamer", back_populates="videos"    )
 
 
 class Genre(Base):

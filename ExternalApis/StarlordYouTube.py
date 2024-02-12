@@ -8,6 +8,7 @@ import requests
 import re
 import os
 from dotenv import load_dotenv
+
 load_dotenv()
 
 api_key = os.getenv("YOUTUBE_TOKEN")
@@ -46,11 +47,15 @@ class YoutubeApi:
             instagram_pattern = r"[a-zA-Z]nstagram\.com%2F[a-zA-Z0-9_]+"
             twitch_pattern = r"[a-zA-Z]witch\.tv%2F[a-zA-Z0-9_]+"
 
-            match_twitter = re.search(pattern=twitter_pattern, string=str(html_content))
+            match_twitter = re.search(
+                pattern=twitter_pattern, string=str(html_content)
+            )
             match_instagram = re.search(
                 pattern=instagram_pattern, string=str(html_content)
             )
-            match_twitch = re.search(pattern=twitch_pattern, string=str(html_content))
+            match_twitch = re.search(
+                pattern=twitch_pattern, string=str(html_content)
+            )
             socials = {"Twitter": None, "Instagram": None, "Twitch": None}
 
             if match_twitter:
@@ -87,7 +92,8 @@ class YoutubeApi:
         print(list_of_recommended_chanels)
 
     def search_particular_indie_gameplay_channels(
-        self, game_name, next_page_token: Union[str , None] = None):
+        self, game_name, next_page_token: Union[str, None] = None
+    ):
         """
         #gameplay
         #walkthrough
@@ -104,7 +110,9 @@ class YoutubeApi:
             )
         else:
             search = self.youtube.search().list(
-                part="snippet", q=f"lets play {game_name}", maxResults=maxResults
+                part="snippet",
+                q=f"lets play {game_name}",
+                maxResults=maxResults,
             )
 
         search_response = search.execute()
@@ -149,9 +157,13 @@ class YoutubeApi:
             channel_title = snippet["channelTitle"]
             # Get additional channel information
             channel_info = (
-                self.youtube.channels().list(part="snippet", id=channel_id).execute()
+                self.youtube.channels()
+                .list(part="snippet", id=channel_id)
+                .execute()
             )
-            description = channel_info["items"][0]["snippet"]["description"].lower()
+            description = channel_info["items"][0]["snippet"][
+                "description"
+            ].lower()
             # print(description)
             # print("*"*20)
             # Check if the channel description contains gameplay keywords
@@ -211,7 +223,9 @@ class YoutubeApi:
         )["items"]
         results = []
         for index, video in enumerate(popular_video_copy):
-            results.append([video[0], video[1], video[2], stats_response[index]])
+            results.append(
+                [video[0], video[1], video[2], stats_response[index]]
+            )
         return results
 
     def get_channel_topics(self, channel_id):
@@ -273,7 +287,8 @@ class YoutubeApi:
             }
 
         return stats
-    #Targets Splattercatgaming video descriptions
+
+    # Targets Splattercatgaming video descriptions
     def video_details(self, video_id):  # -> tuple[str | Any, Any]:
         video_response = (
             self.youtube.videos().list(id=video_id, part="snippet").execute()
@@ -284,8 +299,8 @@ class YoutubeApi:
         match = re.search(pattern=pattern, string=description)
         game_played = ""
         if match:
-            #steam_link = match.group(0)
-            #app_id = match.group(1)
+            # steam_link = match.group(0)
+            # app_id = match.group(1)
             game_played = match.group(2)
         # print(video_tags)
 
@@ -304,7 +319,9 @@ class YoutubeApi:
     def socialsFinder(data: str):
         socials = {"Twitter": None, "Instagram": None, "Twitch": None}
         twitch_pattern = "(^http(s)?://)?((www|en-es|en-gb|secure|beta|ro|www-origin|en-ca|fr-ca|lt|zh-tw|he|id|ca|mk|lv|ma|tl|hi|ar|bg|vi|th)\.)?twitch.tv/(?!directory|p|user/legal|admin|login|signup|jobs)(?P<channel>\w+)"
-        twitter_pattern = "https?://twitter.com/[A-Za-z0-9_]+|twitter.com/[A-Za-z0-9_]+"
+        twitter_pattern = (
+            "https?://twitter.com/[A-Za-z0-9_]+|twitter.com/[A-Za-z0-9_]+"
+        )
         instagram_pattern = (
             "https?://instagram.com/[A-Za-z0-9_]+|instagram.com/[A-Za-z0-9_]+"
         )
@@ -339,7 +356,7 @@ def youtube_search_worker():
         print(scraped)
         print(key)
         print(yt.emailFinder(description))
-        print("*"*20)
+        print("*" * 20)
 
     # stats = yt.channel_statistics(",".join(list_of_channel_ids))
     # TODO UPDATE SAVED CHANNEL USING CHANNEL ID

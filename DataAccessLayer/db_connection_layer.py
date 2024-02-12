@@ -1,25 +1,23 @@
-from sqlalchemy.ext.asyncio import( 
-    create_async_engine, 
-    async_sessionmaker, 
-    AsyncSession)
-from .models import (
-    Streamer, 
-    Video, 
-    Genre, 
-    Genre_Streamer_Association)
+from datetime import datetime
+from sqlalchemy import delete, insert
+from sqlalchemy.ext.asyncio import (
+    create_async_engine,
+    async_sessionmaker,
+    AsyncSession,
+)
+from sqlalchemy.orm import joinedload
+from .models import Streamer, Video, Genre, Genre_Streamer_Association
 from sqlalchemy.future import select
-from typing import( 
-    Dict, 
-    List)
+from typing import Dict, List, Any
 from contextlib import asynccontextmanager
+import datetime
 from dotenv import load_dotenv
 import os
+
+
 print(os.path.abspath)
 load_dotenv()
 neondb = os.getenv("NEONDB_TOKEN")
-
-
-
 
 DATABASE_URL = f"postgresql+asyncpg://{neondb}"
 engine = create_async_engine(url=DATABASE_URL, echo=True, future=True)
@@ -62,26 +60,76 @@ class StreamerDAL:
             await self.db_session.flush()
 
     async def get_all_streamers(self):
-        result = await self.db_session.execute(select(Streamer).order_by(Streamer.id))
-        return {"streamers": [streamer.to_dict() for streamer in result]}
+        result = await self.db_session.execute(
+            select(Streamer).order_by(Streamer.id)
+        )
+        end_r = []
+        for row in result.unique():
+            end_r.append(streamer_to_dict(row[0].__dict__))
+        return {"streamers": end_r}
 
     async def filter_streamers_by_genre(self, filters: Dict[str, list]):
-        query = (
-            select(Streamer)
-            .join(Genre_Streamer_Association)
-            .join(Genre)
-            .where(Genre.name.in_(filters["genres"]))
-        )
+        query = create_filter_query(filters)
         result = await self.db_session.execute(query)
-        end_r = []
+        result = result.unique()
+        end_r = []      
         for chunk in result.partitions():
             for row in chunk:
-                print(row[0].__dict__)
-                end_r.append(row[0].name)
-        print(end_r)
+                end_r.append(streamer_to_dict(row[0].__dict__))
+                print("Videos :",row[0].videos)
 
-        data = {"streamers": [s.to_dict() for s in result.fetchall()]}
-        return "finished db"
+        data = {"streamers": end_r}
+        return data
+    
+    async def add_video_history_streamer(self, id : int, data : List[Dict[Any, Any]]):
+        streamer_owner : Streamer | None = await self.db_session.get(Streamer, id)
+        if not streamer_owner:
+            return
+        await self.db_session.execute(delete(Video).where(Video.owner==id))
+        tmp = []
+        for v in data:
+            v["owner"] = id
+            v["upload_date"]=datetime.datetime.strptime(v["upload_date"], "%Y-%m-%d").date()
+            tmp.append(v)
+        await self.db_session.execute(insert(Video).values(tmp))
+        await self.db_session.commit()
+        #await self.db_session.commit()
+
+
+
+
+def streamer_to_dict(s : Dict[str, Any]):
+    dict = {
+            "id":s["id"],
+            "name": s["name"],
+            "email": s["email"],
+            "twitter": s["twitter"],
+            "twitter_followers": s["twitter_followers"],
+            "instagram": s["instagram"],
+            "instagram_followers": s["instagram_followers"],
+            "twitch_url": s["twitch_url"],
+            "twitch_subs": s["twitch_subs"],
+            "youtube_url": s["youtube_url"],
+            "youtube_subs": s["youtube_subs"],
+            "country": s["country"],
+            # Assuming Video also has a to_dict method
+            #"videos": [video.to_dict() for video in s.videos],
+
+    }
+    return dict
+
+def create_filter_query(filters : Dict[str, Any]):
+    query = (
+        select(Streamer)
+        .join(Genre_Streamer_Association)
+        .join(Genre)
+        .where(Genre.name.in_(filters["genres"]))
+    ).options(joinedload(Streamer.videos))
+    if "youtube" in filters["platforms"]:
+        query = query.filter(Streamer.youtube_url.isnot(None))
+    if "twitch" in filters["platforms"]:
+        query = query.filter(Streamer.twitch_url.isnot(None))
+    return query
 
 
 @asynccontextmanager

@@ -1,6 +1,7 @@
 from dataclasses import dataclass
 from typing import Optional
 
+
 @dataclass
 class StreamerValidation:
     name: str
@@ -15,7 +16,8 @@ class StreamerValidation:
     youtube_subs: Optional[int] = None
     country: Optional[str] = None
 
+
 @dataclass
 class TestValid:
-    name : str
-    email : str | None
+    name: str
+    email: str | None

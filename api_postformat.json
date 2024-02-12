@@ -1,0 +1,28 @@
+
+//http://localhost:5500/all
+//http://localhost:5500/filter_by_genre/genre="multiplayer"&platform="youtube"
+:
+
+
+//http://localhost:5500/update_streamer_videos/
+{
+  "id": 1,
+  "videos":[
+    {"views":13556, "comments":40, "likes":394, "upload_date":"1988-01-17"},
+    {"views":13556, "comments":40, "likes":394, "upload_date":"1988-01-17"}]
+}
+//http://localhost:5500/create_streamer/
+{
+    "name": "wanderbot",
+    "email": "",
+    "twitter": "",
+    "twitter_followers": 1000,
+    "instagram": "",
+    "instagram_followers": 0,
+    "twitch_url": "wanderbot",
+    "twitch_subs": 0,
+    "youtube_url": null,
+    "youtube_subs": 0,
+    "country": "kenya","genres":["multiplayer", "fps"]
+}
+
