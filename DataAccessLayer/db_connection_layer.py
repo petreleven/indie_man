@@ -1,4 +1,5 @@
 from datetime import datetime
+import re
 from sqlalchemy import delete, insert
 from sqlalchemy.ext.asyncio import (
     create_async_engine,
@@ -94,6 +95,21 @@ class StreamerDAL:
         await self.db_session.execute(insert(Video).values(tmp))
         await self.db_session.commit()
         #await self.db_session.commit()
+
+    async def api_get_streamer(self, data : Dict[str, Any]):
+        rows = []
+        if "id" in data:
+            rows = await self.db_session.get(Streamer, data["id"])
+            if rows == None:
+                return False
+            return True
+        query = select(Streamer).where(Streamer.name==data["name"])
+        
+        rows = await self.db_session.execute(query)
+        rows = rows.unique().first()
+        if rows == None:
+            return False
+        return True
 
 
 

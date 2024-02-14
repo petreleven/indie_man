@@ -1,4 +1,4 @@
-from typing import Dict 
+from typing import Dict
 from quart import Quart, render_template, request
 
 import os
@@ -39,12 +39,13 @@ async def channel_genres(genres):
         template_name_or_list="channels.html",
         context={"channels": [i for i in range(30)]},
     )
+
+
 @app.get("/all")
 async def all():
     async with local_data_access() as _streamer_dal:
         data = await _streamer_dal.get_all_streamers()
     return data
-
 
 
 @app.post("/create_streamer/")
@@ -54,6 +55,17 @@ async def create_streamer():
     async with local_data_access() as _streamer_dal:
         await _streamer_dal.create_stremer(data)
     return "operation finished"
+
+
+@app.get("/api/get_streamer")
+async def api_get_streamer():
+    data = await request.get_json()
+    print(data)
+    exists = False
+    async with local_data_access() as _streamer_dal:
+        exists = await _streamer_dal.api_get_streamer(data)
+    print("dooooone")
+    return {"exists":exists}
 
 
 @app.get("/filter_by_genre/<string:req_filters>")
@@ -70,13 +82,15 @@ async def filter_by_genre(req_filters: str):
         )
     return db_or_redis_response
 
+
 @app.post("/update_streamer_videos/")
 async def update_streamer_videos():
     data = await request.get_json()
     print(data)
     async with local_data_access() as _streamer_dal:
-        await _streamer_dal.add_video_history_streamer(data["id"] ,data["videos"])
+        await _streamer_dal.add_video_history_streamer(data["id"], data["videos"])
     return "done"
+
 
 def _split_helper(req_filters: str, sanitized_filters: Dict[str, list]):
     filters = req_filters.split("&")

@@ -1,5 +1,5 @@
 from sqlalchemy.orm import   DeclarativeBase, relationship
-from sqlalchemy import Column, String, Integer, ForeignKey, Date
+from sqlalchemy import Column, Float, String, Integer, ForeignKey, Date
 from sqlalchemy.ext.asyncio import AsyncAttrs
 class Base(DeclarativeBase, AsyncAttrs):
     pass
@@ -36,7 +36,8 @@ class Streamer(Base):
         lazy="joined",
     )
     videos = relationship("Video", back_populates="streamer")
-
+    prev_7_day_views = Column(Integer, default=1)
+    percentage_growth = Column(Float,default=0.0)
 
 
 class Video(Base):

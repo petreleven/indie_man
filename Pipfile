@@ -13,6 +13,9 @@ asyncpg = "*"
 quart-schema = "*"
 pydantic = "*"
 python-dotenv = "*"
+aiohttp = "*"
+redis = "*"
+aioredis = "*"
 
 [dev-packages]
 

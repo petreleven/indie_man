@@ -1,3 +1,4 @@
+from pprint import pprint
 from googleapiclient.discovery import build
 from datetime import datetime
 from typing import Dict, List, Union
@@ -67,8 +68,7 @@ class YoutubeApi:
             return socials
 
         else:
-            return response.status_code
-
+            return None
     """GIVEN A PLAYLIST ID
     RETURNS CHANNELS IN THE PLAYLIST"""
 
@@ -201,19 +201,31 @@ class YoutubeApi:
 
         return formatted_utc_time
 
-    def most_popular_or_recent_video(self, channel_id, order: int = 0):
+    def most_popular_or_recent_video(self, channel_id, order: int = 0, next_page_token : Union[str , None] = None):
         orderFilter = ["viewCount", "date"]
-        channel_response = (
-            self.youtube.search()
-            .list(
-                channelId=channel_id,
-                part="snippet",
-                order=orderFilter[order],
-                fields="items(id,snippet)",
-                maxResults=10,
-            )
-            .execute()
-        )
+        if next_page_token:
+            channel_response = (
+                self.youtube.search()
+                .list(
+                    channelId=channel_id,
+                    part="snippet",
+                    order=orderFilter[order],
+                    fields="items(id,snippet),nextPageToken",
+                    maxResults=10,
+                    nextPagetoken=next_page_token
+                    ).execute())
+        else:
+            channel_response = (
+                self.youtube.search()
+                .list(
+                    channelId=channel_id,
+                    part="snippet",
+                    order=orderFilter[order],
+                    fields="items(id,snippet),nextPageToken",
+                    maxResults=10,
+                    ).execute())
+
+
         popular_video = map(
             self.video_stats, [video for video in channel_response["items"]]
         )
@@ -226,7 +238,8 @@ class YoutubeApi:
             results.append(
                 [video[0], video[1], video[2], stats_response[index]]
             )
-        return results
+        next_page_token = channel_response["nextPageToken"]
+        return results, next_page_token
 
     def get_channel_topics(self, channel_id):
         # Get the uploads playlist of the channel
@@ -273,8 +286,10 @@ class YoutubeApi:
             .execute()
         )
         stats = {}
+        #pprint(channel_response["items"])
         for item in channel_response["items"]:
             stats[item["id"]] = {
+                "description":item["snippet"]["description"],
                 "youtube_subscribers": item["statistics"]["subscriberCount"],
                 "youtube_video_count": item["statistics"]["videoCount"],
                 "youtube_total_views": item["statistics"]["viewCount"],
@@ -289,7 +304,7 @@ class YoutubeApi:
         return stats
 
     # Targets Splattercatgaming video descriptions
-    def video_details(self, video_id):  # -> tuple[str | Any, Any]:
+    def games_played_and_linked_details(self, video_id : str):  # -> tuple[str | Any, Any]:
         video_response = (
             self.youtube.videos().list(id=video_id, part="snippet").execute()
         )
@@ -308,7 +323,8 @@ class YoutubeApi:
 
     @staticmethod
     def emailFinder(data: str):
-        patterns = [r"[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}"]
+        patterns = [r"[A-Za-z0-9._%+-]+(?:@[A-Za-z0-9.-]+\.[A-Za-z]{2,}|\[at\][A-Za-z0-9.-]+\.[A-Za-z]{2,})"]
+
         for p in patterns:
             match = re.findall(pattern=p, string=data)
             if match:
@@ -366,7 +382,7 @@ def youtube_search_worker():
     """
 
 
-youtube_search_worker()
+#youtube_search_worker()
 
 """
 TOTAL SUBS COUNT
