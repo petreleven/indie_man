@@ -48,15 +48,11 @@ class YoutubeApi:
             instagram_pattern = r"[a-zA-Z]nstagram\.com%2F[a-zA-Z0-9_]+"
             twitch_pattern = r"[a-zA-Z]witch\.tv%2F[a-zA-Z0-9_]+"
 
-            match_twitter = re.search(
-                pattern=twitter_pattern, string=str(html_content)
-            )
+            match_twitter = re.search(pattern=twitter_pattern, string=str(html_content))
             match_instagram = re.search(
                 pattern=instagram_pattern, string=str(html_content)
             )
-            match_twitch = re.search(
-                pattern=twitch_pattern, string=str(html_content)
-            )
+            match_twitch = re.search(pattern=twitch_pattern, string=str(html_content))
             socials = {"Twitter": None, "Instagram": None, "Twitch": None}
 
             if match_twitter:
@@ -69,6 +65,7 @@ class YoutubeApi:
 
         else:
             return None
+
     """GIVEN A PLAYLIST ID
     RETURNS CHANNELS IN THE PLAYLIST"""
 
@@ -88,8 +85,6 @@ class YoutubeApi:
             videoOwnerChannelId = snippet["videoOwnerChannelId"]
             videoOwnerChannelTitle = snippet["videoOwnerChannelTitle"]
             list_of_recommended_chanels.append(videoOwnerChannelTitle)
-
-        print(list_of_recommended_chanels)
 
     def search_particular_indie_gameplay_channels(
         self, game_name, next_page_token: Union[str, None] = None
@@ -157,13 +152,9 @@ class YoutubeApi:
             channel_title = snippet["channelTitle"]
             # Get additional channel information
             channel_info = (
-                self.youtube.channels()
-                .list(part="snippet", id=channel_id)
-                .execute()
+                self.youtube.channels().list(part="snippet", id=channel_id).execute()
             )
-            description = channel_info["items"][0]["snippet"][
-                "description"
-            ].lower()
+            description = channel_info["items"][0]["snippet"]["description"].lower()
             # print(description)
             # print("*"*20)
             # Check if the channel description contains gameplay keywords
@@ -201,7 +192,9 @@ class YoutubeApi:
 
         return formatted_utc_time
 
-    def most_popular_or_recent_video(self, channel_id, order: int = 0, next_page_token : Union[str , None] = None):
+    def most_popular_or_recent_video(
+        self, channel_id, order: int = 0, next_page_token: Union[str, None] = None
+    ):
         orderFilter = ["viewCount", "date"]
         if next_page_token:
             channel_response = (
@@ -212,8 +205,10 @@ class YoutubeApi:
                     order=orderFilter[order],
                     fields="items(id,snippet),nextPageToken",
                     maxResults=10,
-                    nextPagetoken=next_page_token
-                    ).execute())
+                    pageToken=next_page_token.decode("utf-8"),
+                )
+                .execute()
+            )
         else:
             channel_response = (
                 self.youtube.search()
@@ -223,8 +218,9 @@ class YoutubeApi:
                     order=orderFilter[order],
                     fields="items(id,snippet),nextPageToken",
                     maxResults=10,
-                    ).execute())
-
+                )
+                .execute()
+            )
 
         popular_video = map(
             self.video_stats, [video for video in channel_response["items"]]
@@ -235,9 +231,7 @@ class YoutubeApi:
         )["items"]
         results = []
         for index, video in enumerate(popular_video_copy):
-            results.append(
-                [video[0], video[1], video[2], stats_response[index]]
-            )
+            results.append([video[0], video[1], video[2], stats_response[index]])
         next_page_token = channel_response["nextPageToken"]
         return results, next_page_token
 
@@ -286,25 +280,23 @@ class YoutubeApi:
             .execute()
         )
         stats = {}
-        #pprint(channel_response["items"])
+        # pprint(channel_response["items"])
         for item in channel_response["items"]:
             stats[item["id"]] = {
-                "description":item["snippet"]["description"],
+                "description": item["snippet"]["description"],
                 "youtube_subscribers": item["statistics"]["subscriberCount"],
                 "youtube_video_count": item["statistics"]["videoCount"],
                 "youtube_total_views": item["statistics"]["viewCount"],
-                "county": (
-                    item["snippet"]["country"]
-                    if hasattr(item["snippet"], "country")
-                    else None
-                ),
+                "country": item["snippet"].get("country", ""),
                 "thumbnail": item["snippet"]["thumbnails"]["default"]["url"],
             }
 
         return stats
 
     # Targets Splattercatgaming video descriptions
-    def games_played_and_linked_details(self, video_id : str):  # -> tuple[str | Any, Any]:
+    def games_played_and_linked_details(
+        self, video_id: str
+    ):  # -> tuple[str | Any, Any]:
         video_response = (
             self.youtube.videos().list(id=video_id, part="snippet").execute()
         )
@@ -323,7 +315,9 @@ class YoutubeApi:
 
     @staticmethod
     def emailFinder(data: str):
-        patterns = [r"[A-Za-z0-9._%+-]+(?:@[A-Za-z0-9.-]+\.[A-Za-z]{2,}|\[at\][A-Za-z0-9.-]+\.[A-Za-z]{2,})"]
+        patterns = [
+            r"[A-Za-z0-9._%+-]+(?:@[A-Za-z0-9.-]+\.[A-Za-z]{2,}|\[at\][A-Za-z0-9.-]+\.[A-Za-z]{2,})"
+        ]
 
         for p in patterns:
             match = re.findall(pattern=p, string=data)
@@ -335,9 +329,7 @@ class YoutubeApi:
     def socialsFinder(data: str):
         socials = {"Twitter": None, "Instagram": None, "Twitch": None}
         twitch_pattern = "(^http(s)?://)?((www|en-es|en-gb|secure|beta|ro|www-origin|en-ca|fr-ca|lt|zh-tw|he|id|ca|mk|lv|ma|tl|hi|ar|bg|vi|th)\.)?twitch.tv/(?!directory|p|user/legal|admin|login|signup|jobs)(?P<channel>\w+)"
-        twitter_pattern = (
-            "https?://twitter.com/[A-Za-z0-9_]+|twitter.com/[A-Za-z0-9_]+"
-        )
+        twitter_pattern = "https?://twitter.com/[A-Za-z0-9_]+|twitter.com/[A-Za-z0-9_]+"
         instagram_pattern = (
             "https?://instagram.com/[A-Za-z0-9_]+|instagram.com/[A-Za-z0-9_]+"
         )
@@ -355,3 +347,12 @@ class YoutubeApi:
 
         return socials
 
+    def get_channel_name(self, channel_id):
+        # youtube = build('youtube', 'v3', developerKey=api_key)
+        request = self.youtube.channels().list(part="snippet", id=channel_id)
+        response = request.execute()
+        if "items" in response:
+            channel = response["items"][0]
+            return channel["snippet"]["title"]
+        else:
+            return None

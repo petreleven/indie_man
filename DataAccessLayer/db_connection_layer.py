@@ -1,5 +1,4 @@
 from datetime import datetime
-import re
 from sqlalchemy import delete, insert
 from sqlalchemy.ext.asyncio import (
     create_async_engine,
@@ -16,7 +15,6 @@ from dotenv import load_dotenv
 import os
 
 
-print(os.path.abspath)
 load_dotenv()
 neondb = os.getenv("NEONDB_TOKEN")
 
@@ -61,9 +59,7 @@ class StreamerDAL:
             await self.db_session.flush()
 
     async def get_all_streamers(self):
-        result = await self.db_session.execute(
-            select(Streamer).order_by(Streamer.id)
-        )
+        result = await self.db_session.execute(select(Streamer).order_by(Streamer.id))
         end_r = []
         for row in result.unique():
             end_r.append(streamer_to_dict(row[0].__dict__))
@@ -73,38 +69,43 @@ class StreamerDAL:
         query = create_filter_query(filters)
         result = await self.db_session.execute(query)
         result = result.unique()
-        end_r = []      
+        end_r = []
         for chunk in result.partitions():
             for row in chunk:
                 end_r.append(streamer_to_dict(row[0].__dict__))
-                print("Videos :",row[0].videos)
 
         data = {"streamers": end_r}
         return data
-    
-    async def add_video_history_streamer(self, id : int, data : List[Dict[Any, Any]]):
-        streamer_owner : Streamer | None = await self.db_session.get(Streamer, id)
+
+    async def add_video_history_streamer(self, id: int, data: List[Dict[Any, Any]]):
+        streamer_owner: Streamer | None = await self.db_session.get(Streamer, id)
         if not streamer_owner:
             return
-        await self.db_session.execute(delete(Video).where(Video.owner==id))
+        await self.db_session.execute(delete(Video).where(Video.owner == id))
         tmp = []
         for v in data:
             v["owner"] = id
-            v["upload_date"]=datetime.datetime.strptime(v["upload_date"], "%Y-%m-%d").date()
+            v["upload_date"] = datetime.datetime.strptime(
+                v["upload_date"], "%Y-%m-%d"
+            ).date()
             tmp.append(v)
         await self.db_session.execute(insert(Video).values(tmp))
         await self.db_session.commit()
-        #await self.db_session.commit()
+        # await self.db_session.commit()
 
-    async def api_get_streamer(self, data : Dict[str, Any]):
+    async def api_get_streamer(self, data: Dict[str, Any]):
         rows = []
         if "id" in data:
             rows = await self.db_session.get(Streamer, data["id"])
             if rows == None:
                 return False
             return True
-        query = select(Streamer).where(Streamer.name==data["name"])
-        
+
+        elif "channel_id" in data:
+            query = select(Streamer).where(Streamer.youtube_url == data["channel_id"])
+        else:
+            query = select(Streamer).where(Streamer.name == data["name"])
+
         rows = await self.db_session.execute(query)
         rows = rows.unique().first()
         if rows == None:
@@ -112,29 +113,27 @@ class StreamerDAL:
         return True
 
 
-
-
-def streamer_to_dict(s : Dict[str, Any]):
+def streamer_to_dict(s: Dict[str, Any]):
     dict = {
-            "id":s["id"],
-            "name": s["name"],
-            "email": s["email"],
-            "twitter": s["twitter"],
-            "twitter_followers": s["twitter_followers"],
-            "instagram": s["instagram"],
-            "instagram_followers": s["instagram_followers"],
-            "twitch_url": s["twitch_url"],
-            "twitch_subs": s["twitch_subs"],
-            "youtube_url": s["youtube_url"],
-            "youtube_subs": s["youtube_subs"],
-            "country": s["country"],
-            # Assuming Video also has a to_dict method
-            #"videos": [video.to_dict() for video in s.videos],
-
+        "id": s["id"],
+        "name": s["name"],
+        "email": s["email"],
+        "twitter": s["twitter"],
+        "twitter_followers": s["twitter_followers"],
+        "instagram": s["instagram"],
+        "instagram_followers": s["instagram_followers"],
+        "twitch_url": s["twitch_url"],
+        "twitch_subs": s["twitch_subs"],
+        "youtube_url": s["youtube_url"],
+        "youtube_subs": s["youtube_subs"],
+        "country": s["country"],
+        # Assuming Video also has a to_dict method
+        # "videos": [video.to_dict() for video in s.videos],
     }
     return dict
 
-def create_filter_query(filters : Dict[str, Any]):
+
+def create_filter_query(filters: Dict[str, Any]):
     query = (
         select(Streamer)
         .join(Genre_Streamer_Association)

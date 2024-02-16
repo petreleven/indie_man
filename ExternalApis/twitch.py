@@ -3,6 +3,7 @@ import pprint
 import os
 from dotenv import load_dotenv
 from typing import Dict
+
 load_dotenv()
 CLIENT_ID = os.getenv("TWITCH_CLIENT_ID")
 CLIENT_SECRET = os.getenv("TWITCH_CLIENT_SECRET")
@@ -17,7 +18,7 @@ data = {
 base_url = "https://api.twitch.tv/helix/games?name=Valorant"
 
 
-def getGameID(game_name:str, headers: Dict[str, str]):
+def getGameID(game_name: str, headers: Dict[str, str]):
     base_url = f"https://api.twitch.tv/helix/games?name={game_name}"
     response = requests.get(base_url, headers=headers)
     if response.status_code == 200:
@@ -114,6 +115,7 @@ def getGameFromID(game_id: str, headers):
             return data[0]["name"]
         return None
     return None
+
 
 def getHTMLpanelContent(channel_name: str):
     session = requests_html.HTMLSession()

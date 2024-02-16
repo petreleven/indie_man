@@ -16,7 +16,7 @@ app.static_folder = static_folder
 # Ensure db exists before startup
 @app.before_serving
 async def create_db_tables():
-    return
+    # return
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.drop_all)
         await conn.run_sync(Base.metadata.create_all)
@@ -65,7 +65,7 @@ async def api_get_streamer():
     async with local_data_access() as _streamer_dal:
         exists = await _streamer_dal.api_get_streamer(data)
     print("dooooone")
-    return {"exists":exists}
+    return {"exists": exists}
 
 
 @app.get("/filter_by_genre/<string:req_filters>")
