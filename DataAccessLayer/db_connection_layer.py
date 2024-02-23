@@ -1,11 +1,11 @@
 from datetime import datetime
-from sqlalchemy import delete, insert
+from sqlalchemy import delete, insert, text
 from sqlalchemy.ext.asyncio import (
     create_async_engine,
     async_sessionmaker,
     AsyncSession,
 )
-from sqlalchemy.orm import joinedload
+from sqlalchemy.orm import joinedload, query
 from .models import Streamer, Video, Genre, Genre_Streamer_Association
 from sqlalchemy.future import select
 from typing import Dict, List, Any
@@ -19,7 +19,11 @@ load_dotenv()
 neondb = os.getenv("NEONDB_TOKEN")
 
 DATABASE_URL = f"postgresql+asyncpg://{neondb}"
-engine = create_async_engine(url=DATABASE_URL, echo=True, future=True)
+engine = create_async_engine(url=DATABASE_URL, 
+                             echo=True, 
+                             future=True, 
+                            query_cache_size=0)
+
 # sessionmaker version
 async_session = async_sessionmaker(engine, expire_on_commit=False)
 
@@ -65,17 +69,44 @@ class StreamerDAL:
             end_r.append(streamer_to_dict(row[0].__dict__))
         return {"streamers": end_r}
 
+    async def api_get_all_streamers_paginated(self, page_number=1, items_per_page = 5):
+        offset = (page_number-1) * items_per_page
+        query = text(f"SELECT * FROM streamers LIMIT {items_per_page} OFFSET {offset}")
+        result = await self.db_session.execute(query)
+        end_r = {"streamers":[]}
+        for row in result.unique():
+            end_r["streamers"].append(list(row))
+        return end_r
+
+    async def get_all_streamers_paginated(self, page_number=1, items_per_page = 50):
+        offset = (page_number-1) * items_per_page
+        query =  (select(Streamer)
+                    .join(Genre_Streamer_Association)
+                    .join(Genre)
+                    .offset(offset)
+                    .limit(items_per_page))
+
+
+        result = await self.db_session.execute(query)
+        end_r = {"streamers":[]}
+        for row in result.unique():
+            end_r["streamers"].append(list(row))
+        return end_r
+
+
+
     async def filter_streamers_by_genre(self, filters: Dict[str, list]):
         query = create_filter_query(filters)
         result = await self.db_session.execute(query)
-        result = result.unique()
-        end_r = []
-        for chunk in result.partitions():
-            for row in chunk:
-                end_r.append(streamer_to_dict(row[0].__dict__))
+        #result = result.unique()
+        end_r = {"streamers":[]}
+        #for chunk in result.partitions():
+        #  for row in chunk:
+        #        end_r["streamers"].append(streamer_to_dict(row[0].__dict__))
+        for row in result.unique():
+           end_r["streamers"].append(list(row))
 
-        data = {"streamers": end_r}
-        return data
+        return end_r
 
     async def add_video_history_streamer(self, id: int, data: List[Dict[Any, Any]]):
         streamer_owner: Streamer | None = await self.db_session.get(Streamer, id)
@@ -138,8 +169,9 @@ def create_filter_query(filters: Dict[str, Any]):
         select(Streamer)
         .join(Genre_Streamer_Association)
         .join(Genre)
-        .where(Genre.name.in_(filters["genres"]))
-    ).options(joinedload(Streamer.videos))
+        .offset(0)
+        .limit(10)
+        .where(Genre.name.in_(filters["genres"]))) #.options(joinedload(Streamer.videos))
     if "youtube" in filters["platforms"]:
         query = query.filter(Streamer.youtube_url.isnot(None))
     if "twitch" in filters["platforms"]:

@@ -1,0 +1,36 @@
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>Gnome</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script
+      src="https://unpkg.com/htmx.org@1.9.10"
+
+      crossorigin="anonymous"
+    ></script>
+    <link href="../static/css/output.css" rel="stylesheet" />
+    <script
+      src="https://kit.fontawesome.com/be2e2c9846.js"
+      crossorigin="anonymous"
+    ></script>
+
+    <script src="../static/js/browserpreferences.js"></script>
+    <script src="../static/js/menutoggle.js" defer></script>
+
+    <!--DEFERED-->
+    <script src="../static/js/flowbite.js" defer></script>
+    <script src="../static/js/tooglemode.js" defer></script>
+        <script src="../static/js/faqs.js" defer></script>
+    <script src="../static/js/sidebar.js" defer></script>
+    <script src="https://unpkg.com/htmx.org@1.9.10" integrity="sha384-D1Kt99CQMDuVetoL1lrYwg5t+9QdHe7NLX/SoJYkXDFfX37iInKRy5xLSi8nO7UC" crossorigin="anonymous"></script>
+  </head>
+<body>
+<div>
+    <button class="text-neutral-50 bg-teal-400" hx-post="/exp" hx-include="[name='email']">
+        Register!
+    </button>
+    Enter email: <input name="email" type="checkbox" value="hah"/>
+</div>
+</body>
+
+

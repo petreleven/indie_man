@@ -1,5 +1,4 @@
 from os import stat
-from pprint import pprint
 from aiohttp import ClientSession, TCPConnector
 from aiohttp.client_exceptions import ClientOSError
 from redis.commands.core import ResponseT
@@ -26,6 +25,8 @@ SPLATTERCAT_GAMES_NEXTPAGE_TOKEN = "next_page_token:splattercatgaming"
 # GETS AND SAVES INDIE GAMES PLAYED BY SPLATTERCAT THE OG :)
 async def worker_get_all_games_by_splatter_cat():
     channel_id = yt.get_channel_id_by_name("splattercatgaming")
+    # channel_id = yt.get_channel_id_by_name("wanderbots")
+
     # get the next page
     token: ResponseT | None = r.get(SPLATTERCAT_GAMES_NEXTPAGE_TOKEN)
     results, next_page_token = yt.most_popular_or_recent_video(
@@ -106,6 +107,67 @@ async def worker_yt_add_channels_to_db():
                     print("done")
                 else:
                     print(f"Error while posting to {url_p}")
+
+
+async def yt_worker_update_streamer_video_history():
+    url = base_url + "api/api_get_streamer_paginated"
+    result = {}
+    connector = TCPConnector(limit=1000)  # Reuse connections
+    async with aiohttp.ClientSession(connector=connector) as Session:
+        result = await get_paginated_result(Session, url)
+
+    if not result["streamers"]:
+        return
+    data = [(r[0], r[-5]) for r in result["streamers"]]
+    result.clear()
+
+    request_data = [fetch_most_poupular_video(ch) for ch in data]
+
+    post_url = base_url + "/api/update_streamer_videos/"
+
+    connector = TCPConnector(limit=1000)  # Reuse connections
+    async with aiohttp.ClientSession(connector=connector) as Session:
+        for d in request_data:
+            await update_videos(post_url, Session, d)
+
+
+async def get_paginated_result(Session: ClientSession, url):
+    async with Session.get(url) as response:
+        if response.status == 200:
+            result = await response.json()
+            return result
+        else:
+            return {"streamers": []}
+
+
+async def update_videos(post_url: str, Session: ClientSession, data):
+    async with Session.post(post_url, json=data) as response:
+        if response.status == 200:
+            pass
+        else:
+            print("Error in post")
+
+
+def fetch_most_poupular_video(ch):
+    vids = YoutubeApi().most_popular_or_recent_video(channel_id=ch[1])
+    vids = vids[0]
+    return generate_video_data(ch[0], vids)
+
+
+def generate_video_data(db_id: int, videos: List[list]):
+    data = {"id": db_id, "videos": []}
+    for video in videos:
+        statistics = video[-1]["statistics"]
+        stat = {
+            "views": int(statistics["viewCount"]) if "viewCount" in statistics else 0,
+            "comments": (
+                int(statistics["commentCount"]) if "commentCount" in statistics else 0
+            ),
+            "likes": int(statistics["likeCount"]) if "likeCount" in statistics else 0,
+            "upload_date": "1988-01-17",
+        }
+        data["videos"].append(stat)
+    return data
 
 
 def add_streamer(channel_id, genres: List[str]):
@@ -198,11 +260,9 @@ async def create_single_streamer(name="splattercatgaming"):
                 instagram_username = socials["Instagram"].split("2F")[1]
                 data["instagram"] = instagram_username
 
-        pprint(data)
-
 
 loop = asyncio.get_event_loop()
 loop.run_until_complete(worker_get_all_games_by_splatter_cat())
 loop.run_until_complete(worker_yt_search_for_indie_playing_channels())
 loop.run_until_complete(worker_yt_add_channels_to_db())
-#loop.run_until_complete(worker_get_all_games_by_splatter_cat())
+# loop.run_until_complete(yt_worker_update_streamer_video_history())

@@ -178,6 +178,9 @@ class YoutubeApi:
         return video_stats_helper_response
 
     def video_stats(self, video):
+        # videoId = video["id"]["videoId"]
+        if "videoId" not in video["id"]:
+            return ("", "", "")
         videoId = video["id"]["videoId"]
         videoTitle = video["snippet"]["title"]
         publishedAt = self.time_converter(video["snippet"]["publishedAt"])
@@ -196,6 +199,7 @@ class YoutubeApi:
         self, channel_id, order: int = 0, next_page_token: Union[str, None] = None
     ):
         orderFilter = ["viewCount", "date"]
+        channel_response = ""
         if next_page_token:
             channel_response = (
                 self.youtube.search()
@@ -204,7 +208,7 @@ class YoutubeApi:
                     part="snippet",
                     order=orderFilter[order],
                     fields="items(id,snippet),nextPageToken",
-                    maxResults=10,
+                    maxResults=50,
                     pageToken=next_page_token.decode("utf-8"),
                 )
                 .execute()
@@ -217,15 +221,14 @@ class YoutubeApi:
                     part="snippet",
                     order=orderFilter[order],
                     fields="items(id,snippet),nextPageToken",
-                    maxResults=10,
+                    maxResults=50,
                 )
                 .execute()
             )
-
         popular_video = map(
             self.video_stats, [video for video in channel_response["items"]]
         )
-        popular_video_copy = [x for x in popular_video]
+        popular_video_copy = [x for x in popular_video if len(x[0]) > 0]
         stats_response = self.video_stats_helper(
             ",".join([x[0] for x in popular_video_copy])
         )["items"]

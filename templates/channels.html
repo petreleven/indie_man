@@ -4,12 +4,7 @@
     <meta charset="UTF-8" />
     <title>Gnome</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <script
-      src="https://unpkg.com/htmx.org@1.9.10"
-      integrity="sha384-D1Kt99CQMDuVetoL1lrYwg5t+9QdHe7NLX/SoJYkXDFfX37iInKRy5xLSi8nO7UC"
-      crossorigin="anonymous"
-    ></script>
-    <link href="../static/css/output.css" rel="stylesheet" />
+       <link href="../static/css/output.css" rel="stylesheet" />
     <script
       src="https://kit.fontawesome.com/be2e2c9846.js"
       crossorigin="anonymous"
@@ -27,6 +22,13 @@
     ></script>
     <script src="../static/js/faqs.js" defer></script>
     <script src="../static/js/sidebar.js" defer></script>
+ <script
+      src="https://unpkg.com/htmx.org@1.9.10"
+      integrity="sha384-D1Kt99CQMDuVetoL1lrYwg5t+9QdHe7NLX/SoJYkXDFfX37iInKRy5xLSi8nO7UC"
+      crossorigin="anonymous"
+    ></script>
+ <link rel="stylesheet"  href="../static/css/loaders.css">
+
   </head>
 
   <body
@@ -164,59 +166,71 @@
             </div>
           </li>
           <li>
+           
+
             <div
               class="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group"
-            >
+     >
               <i class="fa-solid fa-gamepad"></i>
               <span class="ms-3 text-text-50 font-bold text-lg"
                 >Genres Played</span
               >
             </div>
-
+            <button class="text-neutral-50 bg-teal-400" 
+              hx-post="/filter_streamers" 
+              hx-include=".genre_f "
+              hx-swap="outerHTML" 
+              hx-target="#channels_partials_target"
+              hx-indicator="#indicator">
+              Apply filters
+            </button>
             <div
               class="flex flex-row text-sm lg:text-base flex-wrap place-items-center"
             >
-              <a
-                class="text-neutral-50/60 hover:text-teal-300 px-4 py-1 hover:underline hover:decoration-teal-300 underline-offset-2 cursor-pointer w-1/2"
-              >
+              <label class="text-neutral-50/60 hover:text-teal-300 px-4 py-1 hover:underline hover:decoration-teal-300 underline-offset-2 cursor-pointer w-1/2 flex items-center">
+                <input type="checkbox" name="genre" class="mr-2 rounded  font-medium text-blue-400 genre_f" value="roguelike">
                 Roguelike
-              </a>
-              <a
-                class="text-neutral-50/60 hover:text-teal-300 px-4 py-1 hover:underline hover:decoration-teal-300 underline-offset-2 cursor-pointer w-1/2"
-              >
+              </label>
+               <label class="text-neutral-50/60 hover:text-teal-300 px-4 py-1 hover:underline hover:decoration-teal-300 underline-offset-2 cursor-pointer w-1/2 flex items-center">
+                <input type="checkbox" class="mr-2 rounded  font-medium text-blue-400 genre_f" name="genre" value="strategy">
                 Strategy
-              </a>
-              <a
-                class="text-neutral-50/60 hover:text-teal-300 px-4 py-1 hover:underline hover:decoration-teal-300 underline-offset-2 cursor-pointer w-1/2"
-              >
+              </label>
+</label>
+               <label class="text-neutral-50/60 hover:text-teal-300 px-4 py-1 hover:underline hover:decoration-teal-300 underline-offset-2 cursor-pointer w-1/2 flex items-center">
+                <input type="checkbox" class="mr-2 rounded  font-medium text-blue-400 genre_f" name="genre" value="action">
+                Action
+              </label>
+<label class="text-neutral-50/60 hover:text-teal-300 px-4 py-1 hover:underline hover:decoration-teal-300 underline-offset-2 cursor-pointer w-1/2 flex items-center">
+                <input type="checkbox" class="mr-2 rounded  font-medium text-blue-400 genre_f" name="genre" value="adventure">
+                Adventure
+              </label>
+ </label>
+<label class="text-neutral-50/60 hover:text-teal-300 px-4 py-1 hover:underline hover:decoration-teal-300 underline-offset-2 cursor-pointer w-1/2 flex items-center">
+                <input type="checkbox" class="mr-2 rounded  font-medium text-blue-400 genre_f" name="genre" value="rpg">
+                Rpg
+              </label>
+ </label>
+<label class="text-neutral-50/60 hover:text-teal-300 px-4 py-1 hover:underline hover:decoration-teal-300 underline-offset-2 cursor-pointer w-1/2 flex items-center">
+                <input type="checkbox" class="mr-2 rounded  font-medium text-blue-400 genre_f" name="genre" value="fps">
                 Fps
-              </a>
-              <a
-                class="text-neutral-50/60 hover:text-teal-300 px-4 py-2 hover:underline hover:decoration-teal-300 underline-offset-2 cursor-pointer w-1/2"
-              >
-                Simulation
-              </a>
-              <a
-                class="text-neutral-50/60 hover:text-teal-300 px-4 py-2 hover:underline hover:decoration-teal-300 underline-offset-2 cursor-pointer w-1/2"
-              >
-                RPG
-              </a>
-              <a
-                class="text-neutral-50/60 hover:text-teal-300 px-4 py-2 hover:underline hover:decoration-teal-300 underline-offset-2 cursor-pointer w-1/2"
-              >
-                Shooter
-              </a>
-              <a
-                class="text-neutral-50/60 hover:text-teal-300 px-4 py-2 hover:underline hover:decoration-teal-300 underline-offset-2 cursor-pointer w-1/2"
-              >
+              </label>
+<label class="text-neutral-50/60 hover:text-teal-300 px-4 py-1 hover:underline hover:decoration-teal-300 underline-offset-2 cursor-pointer w-1/2 flex items-center">
+                <input type="checkbox" class="mr-2 rounded  font-medium text-blue-400 genre_f" name="genre" value="survival">
                 Survival
-              </a>
-              <a
-                class="text-neutral-50/60 hover:text-teal-300 px-4 py-2 hover:underline hover:decoration-teal-300 underline-offset-2 cursor-pointer w-1/2"
-              >
+              </label>
+ </label>
+<label class="text-neutral-50/60 hover:text-teal-300 px-4 py-1 hover:underline hover:decoration-teal-300 underline-offset-2 cursor-pointer w-1/2 flex items-center">
+                <input type="checkbox" class="mr-2 rounded  font-medium text-blue-400 genre_f" name="genre" value="puzzle">
                 Puzzle
-              </a>
-              <a
+              </label>
+
+
+
+
+
+
+
+                                                    <a
                 class="text-neutral-50/60 hover:text-teal-300 px-4 py-2 hover:underline hover:decoration-teal-300 underline-offset-2 cursor-pointer"
               >
                 More Filters <i class="fa-solid fa-arrow-right"></i>
@@ -438,13 +452,20 @@
         </div>
         <div class="grid grid-cols-1 gap-4 mb-4">
           <div
-            class="block w-full overflow-x-auto border border-transparent rounded-md"
+            class="block w-full overflow-x-auto border border-transparent rounded-md text-center h-[1000px]"
           >
+            <div class="loader htmx-indicator " id="indicator" style="top:130px;">
+  <div></div>
+  <div></div>
+  <div></div>
+  <div></div>
+</div>
+        
             <table
               class="items-center w-full border-collapse text-blueGray-700 p-1"
-            >
+             id="channels_partials_target">
               <thead>
-                <tr
+                      <tr
                   class="odd:bg-primary-900 odd:dark::bg-primary-900 even:bg-transparent/[0.3] even:dark:bg-transparent/[0.3] border-b dark:border-gray-700 text-neutral-200"
                 >
                   <th
@@ -469,24 +490,24 @@
                     Views Growth
                   </th>
                   <th
-                    class="px-6 align-middle py-3 text-xs uppercase border-l-0 whitespace-nowrap font-semibold text-left"
+                    class="px-6 align-middle py-3 text-xs uppercase border-l-0 whitespace-nowrap font-semibold text-left w-max-[30px] w-[30px]"
                   >
-                    Followers
+                    Youtube Subscribers
                   </th>
                   <th
-                    class="px-6 align-middle py-3 text-xs uppercase border-l-0 whitespace-nowrap font-semibold text-left"
+                    class="px-6 align-middle py-3 text-xs uppercase border-l-0 whitespace-nowrap font-semibold text-center"
                   >
                     Platforms
                   </th>
                   <th
                     class="px-6 align-middle py-3 text-xs uppercase border-l-0 whitespace-nowrap font-semibold text-left"
                   >
-                    Genres
+                    Genres played
                   </th>
                 </tr>
               </thead>
               <tbody>
-                {% for data in context.channels %}
+                {% for data in context.streamers %}
                 <tr
                   class="odd:bg-primary-900/[.3] odd:dark::bg-primary-900 even:bg-gray-200 even:dark:bg-gray-900 border-b dark:border-gray-700"
                 >
@@ -511,17 +532,17 @@
                         src="https://picsum.photos/200"
                         alt="Rounded avatar"
                       />
-                      <div class="p-2">Facebook</div>
+                      <div class="p-2">{{data[0].name}}</div>
                     </div>
                   </th>
                   <td
                     class="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4 text-neutral-200 w-[20px]"
                   >
-                    🇺🇸
+                  {{data[0].country}}
                   </td>
 
                   <td
-                    class="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4 text-neutral-200 w-max-[250px] lg:w-[250px]"
+                    class="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4 text-neutral-200 w-max-[190px] lg:w-[180px]"
                   >
                     <span class="text-sm">30,000</span>
                     <span
@@ -531,24 +552,30 @@
                     </span>
                   </td>
                   <td
-                    class="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4 text-neutral-200"
+                    class="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4 text-neutral-200 w-[30px] text-center"
                   >
-<span class="text-sm">30,000</span>
+                  <span class="text-sm text-center">{{data[0].youtube_subs}}</span>
                   </td>
                   <td
-                    class="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4 text-neutral-200 w-max-[250px] lg:w-[250px]"
+                    class="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4 text-neutral-200 w-max-[250px] lg:w-[250px] text-center"
                   >
                     <div
-                      class="flex flex-row text-sm lg:text-base flex-wrap place-items-center"
+                      class="flex flex-row text-base lg:text-lg flex-wrap place-items-center gap-1 justify-center text-center"
                     >
-                      <i class="fab fa-twitch"></i>
-                      <i class="fab fa-youtube"></i>
+                    {% if data[0].twitch_url %}
+                    <a href='https://twitch.com/{{ data[0].twitch_url}}' target="_blank" class="text-[#9146ff]"><i class="fab fa-twitch"></i></a>
+                    {% endif %}
+                    <a href='https://youtube.com/channel/{{ data[0].youtube_url}}' target="_blank" class="text-[#CD201F]"><i class="fab fa-youtube"></i></a>
                     </div>
                   </td>
                   <td
-                    class="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4 text-neutral-200"
+                    class="border-t-0 px-6 align-middle border-l-0 border-r-0 text-sm whitespace-nowrap p-4 text-neutral-200"
                   >
-                    <p>Rouguelike, 2d..</p>
+                  <p>
+                    {% for genre in data[0].genres %}
+                      {{genre.name}},
+                    {% endfor %}
+                  </p>
                   </td>
                 </tr>
                 {%endfor%}
