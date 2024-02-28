@@ -452,7 +452,7 @@
         </div>
         <div class="grid grid-cols-1 gap-4 mb-4">
           <div
-            class="block w-full overflow-x-auto border border-transparent rounded-md text-center h-[1000px]"
+            class="block w-full overflow-x-auto border border-transparent rounded-md text-center h-[1500px]"
           >
             <div class="loader htmx-indicator " id="indicator" style="top:130px;">
   <div></div>
@@ -500,7 +500,7 @@
                     Platforms
                   </th>
                   <th
-                    class="px-6 align-middle py-3 text-xs uppercase border-l-0 whitespace-nowrap font-semibold text-left"
+                    class="px-6 align-middle py-3 text-xs uppercase border-l-0 whitespace-nowrap font-semibold text-center"
                   >
                     Genres played
                   </th>
@@ -524,21 +524,25 @@
                     </div>
                   </td>
                   <th
-                    class="border-t-0 px-6 align-middle border-l-0 border-r-0 text-sm whitespace-nowrap p-4 text-text-50 text-left w-max-[250px] lg:w-[250px]"
+                    class="border-t-0  align-middle border-l-0 border-r-0 text-sm whitespace-nowrap p-[1rem] lg:p-4 text-text-50 text-left w-[10px] lg:w-max-[250px] lg:w-[250px]"
                   >
                     <div class="flex flex-row">
                       <img
-                        class="w-10 h-10 rounded-full"
-                        src="https://picsum.photos/200"
+                        class="w-7 h-7 lg:w-10 lg:h-10 rounded-full"
+                        src="{{data[0].profile_image}}"
                         alt="Rounded avatar"
                       />
-                      <div class="p-2">{{data[0].name}}</div>
+                      <div class="p-2 text-xs lg:text-sm">{{data[0].name}}</div>
                     </div>
                   </th>
                   <td
-                    class="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4 text-neutral-200 w-[20px]"
+                    class="border-t-0 px-2 lg:px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4 text-neutral-200 w-[10px] lg:w-[20px] text-xs lg:text-sm"
                   >
-                  {{data[0].country}}
+                  {% if data[0].country %}
+                    {{data[0].country}}
+                  {% else %}
+                      -
+                  {% endif %}
                   </td>
 
                   <td

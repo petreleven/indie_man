@@ -6,17 +6,13 @@ from StarlordYouTube import YoutubeApi
 from rawg import rawg_genre_endpoint
 import aiohttp
 import asyncio
-from typing import List
+from typing import Dict, List
 import redis
 
 yt = YoutubeApi()
 base_url = "http://localhost:5500/"
-r = redis.Redis(
-    host="redis-13909.c322.us-east-1-2.ec2.cloud.redislabs.com",
-    port=13909,
-    password="",
-)
-
+redis_uri = 'rediss://default:AVNS_HGy3MPONdAY8PNN6fLi@redis-53f0042-indiecache.a.aivencloud.com:23923'
+r = redis.from_url(redis_uri)
 GAMES_QUEUE = "games:all"
 YT_CHANNELS_QUEUE = "channels:all"
 SPLATTERCAT_GAMES_NEXTPAGE_TOKEN = "next_page_token:splattercatgaming"
@@ -32,7 +28,10 @@ async def worker_get_all_games_by_splatter_cat():
     results, next_page_token = yt.most_popular_or_recent_video(
         channel_id, order=1, next_page_token=token
     )
-    r.set(SPLATTERCAT_GAMES_NEXTPAGE_TOKEN, str(next_page_token))
+    if next_page_token:
+        r.set(SPLATTERCAT_GAMES_NEXTPAGE_TOKEN, str(next_page_token))
+    else:
+        r.delete(SPLATTERCAT_GAMES_NEXTPAGE_TOKEN)
     video_ids: List[str] = [x[0] for x in results]
     games_played = map(yt.games_played_and_linked_details, video_ids)
     games_played = [video[0] for video in list(games_played) if video[0]]
@@ -78,25 +77,15 @@ async def worker_yt_add_channels_to_db():
 
     url = base_url + "api/get_streamer"
     headers = {"Content-Type": "application/json"}
-    connector = TCPConnector(limit=100)  # Reuse connections
+    connector = TCPConnector(limit=300)  # Reuse connections
     async with aiohttp.ClientSession(connector=connector) as Session:
         data_to_send = []
-        for index, ch in enumerate(set(channel_ids)):
-            data = {"channel_id": ch}
-            exists = False
-            try:
-                async with Session.get(
-                    url, json=data, headers=headers, timeout=30
-                ) as response:
-                    if response.status == 200:
-                        result = await response.json()
-                        print("API RESPONSE: ", result)
-                        exists = result.get("exists", False)
-            except (ClientOSError, asyncio.TimeoutError) as e:
-                print(f"Error occurred: {e}")
-                # Handle error or retry
-            if not exists:
-                data_to_send.append(add_streamer(ch, genres[index]))
+        channls_to_update_genres = []
+        await channel_enumerator(channel_ids=channel_ids, Session=Session,
+                                 url=url,
+                                 headers=headers, genres=genres, 
+                                 data_to_send=data_to_send, 
+                                 channls_to_update_genres=channls_to_update_genres) 
 
         url_p = base_url + "create_streamer/"
         for d in data_to_send:
@@ -107,6 +96,14 @@ async def worker_yt_add_channels_to_db():
                     print("done")
                 else:
                     print(f"Error while posting to {url_p}")
+        url_to_update_streamer_genres = base_url+"/api/update_streamer_genres/"
+        for c in channls_to_update_genres:
+            async with Session.post(
+                url=url_to_update_streamer_genres, json=c, timeout=50) as response:
+                if response.status == 200:
+                    print("Updated streamer")
+                else:
+                    print(f"Error updating genres {response.status}")
 
 
 async def yt_worker_update_streamer_video_history():
@@ -184,12 +181,14 @@ def add_streamer(channel_id, genres: List[str]):
         "youtube_subs": 0,
         "country": "",
         "genres": [],
+        "profile_image":""
     }
     stats = yt.channel_statistics(channel_id)
     data["youtube_subs"] = int(stats[channel_id]["youtube_subscribers"])
     data["youtube_url"] = channel_id
     data["country"] = stats[channel_id]["country"]
     data["genres"] = genres
+    data["profile_image"]= stats[channel_id]["thumbnail"]
     description = stats[channel_id]["description"]
     email = yt.emailFinder(description)
     if email:
@@ -260,6 +259,27 @@ async def create_single_streamer(name="splattercatgaming"):
                 instagram_username = socials["Instagram"].split("2F")[1]
                 data["instagram"] = instagram_username
 
+
+async def channel_enumerator(channel_ids, Session:ClientSession, url:str, headers:Dict, 
+                             genres : List,data_to_send:List, channls_to_update_genres:List ):
+    for index, ch in enumerate(set(channel_ids)):
+        data = {"channel_id": ch}
+        exists = False
+        try:
+            async with Session.get(
+                url, json=data, headers=headers, timeout=30
+            ) as response:
+                if response.status == 200:
+                    result = await response.json()
+                    print("API RESPONSE: ", result)
+                    exists = result.get("exists", False)
+        except (ClientOSError, asyncio.TimeoutError) as e:
+            print(f"Error occurred: {e}")
+            # Handle error or retry
+        if not exists:
+            data_to_send.append(add_streamer(ch, genres[index]))
+        else:
+            channls_to_update_genres.append({"youtube_url":ch, "genres":genres[index]})
 
 loop = asyncio.get_event_loop()
 loop.run_until_complete(worker_get_all_games_by_splatter_cat())

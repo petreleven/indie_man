@@ -40,6 +40,7 @@ class Streamer(Base):
     videos = relationship("Video", back_populates="streamer")
     prev_7_day_views = Column(Integer, default=1)
     percentage_growth = Column(Float, default=0.0)
+    profile_image = Column(String, nullable=True)
 
 
 class Video(Base):

@@ -13,16 +13,24 @@ from contextlib import asynccontextmanager
 import datetime
 from dotenv import load_dotenv
 import os
+from uuid import uuid4
+from asyncpg import Connection
+
 
 
 load_dotenv()
 neondb = os.getenv("NEONDB_TOKEN")
 
-DATABASE_URL = f"postgresql+asyncpg://{neondb}"
+class CConnection(Connection):
+    def _get_unique_id(self, prefix: str) -> str:
+        return f'__asyncpg_{prefix}_{uuid4()}__'
+
+DATABASE_URL = f"postgresql+asyncpg://{neondb}?prepared_statement_cache_size=0"
 engine = create_async_engine(url=DATABASE_URL, 
                              echo=True, 
-                             future=True, 
-                            query_cache_size=0)
+                             future=True,
+                            connect_args={'connection_class': CConnection,
+    })
 
 # sessionmaker version
 async_session = async_sessionmaker(engine, expire_on_commit=False)
@@ -46,6 +54,7 @@ class StreamerDAL:
             youtube_url=streamer_dict["youtube_url"],
             youtube_subs=streamer_dict["youtube_subs"],
             country=streamer_dict["country"],
+            profile_image= streamer_dict["profile_image"]
         )
         has_genres_associated = "genres" in streamer_dict
         _genres: List[Genre] = []
@@ -142,6 +151,19 @@ class StreamerDAL:
         if rows == None:
             return False
         return True
+    async def update_streamer_genres(self, data : Dict):
+        rows = await self.db_session.execute(select(Streamer).where(Streamer.youtube_url== data["youtube_url"]))
+        streamer : Streamer = rows.unique().one()[0]
+        for g in data["genres"]:
+            resp = await self.db_session.execute(select(Genre).
+                                                 where(
+                                                 Genre.name==g))
+            genre = resp.unique().first()
+            if genre==None:
+                new_genre = Genre(name=g)
+                streamer.genres.append(new_genre)
+                self.db_session.add(new_genre)
+        await self.db_session.commit() 
 
 
 def streamer_to_dict(s: Dict[str, Any]):

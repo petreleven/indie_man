@@ -95,7 +95,7 @@ class YoutubeApi:
         lets play#
         let's play #
         """
-        maxResults = 20
+        maxResults = 50
         if next_page_token:
             search = self.youtube.search().list(
                 part="snippet",
@@ -235,7 +235,7 @@ class YoutubeApi:
         results = []
         for index, video in enumerate(popular_video_copy):
             results.append([video[0], video[1], video[2], stats_response[index]])
-        next_page_token = channel_response["nextPageToken"]
+        next_page_token = channel_response["nextPageToken"] if "nextPageToken" in channel_response else None
         return results, next_page_token
 
     def get_channel_topics(self, channel_id):

@@ -23,9 +23,18 @@ async def api_get_streamer_paginated():
 
 
 @api_workers.post("/api/update_streamer_videos/")
-async def update_streamer_videos():
+async def api_update_streamer_videos():
     data = await request.get_json()
     print(data)
     async with local_data_access() as _streamer_dal:
         await _streamer_dal.add_video_history_streamer(data["id"], data["videos"])
-    return "done"
+    return "done"       
+
+
+@api_workers.route("/api/update_streamer_genres/", methods =["GET", "POST"])
+async def api_update_streamer_genres():
+    data = await request.get_json()
+    print(data)
+    async with local_data_access() as _streamer_dal:
+        await _streamer_dal.update_streamer_genres(data)
+    return "done updating"

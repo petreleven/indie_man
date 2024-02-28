@@ -2,7 +2,7 @@ from typing import Dict
 from quart import Quart, render_template, request
 from sqlalchemy import True_
 from sqlalchemy.orm import context
-from api_endpoints.workers_endpoints import api_workers
+from blueprints.api.workers_endpoints import api_workers
 import os
 from DataAccessLayer.models import Base
 from DataAccessLayer.db_connection_layer import engine, local_data_access
@@ -36,11 +36,11 @@ async def index():
     )
 
 
-@app.route("/channels/<string:genres>",methods =["GET", "POST"])
-async def channel_genres(genres):
+@app.route("/channels/all",methods =["GET", "POST"])
+async def channel_genres():
     data = {}
-    #async with local_data_access() as _streamer_dal:
-    #    data = await _streamer_dal.get_all_streamers_paginated(page_number=1)
+    async with local_data_access() as _streamer_dal:
+       data = await _streamer_dal.get_all_streamers_paginated(page_number=1)
     return await render_template(
         template_name_or_list="channels.html",
         context=data,
