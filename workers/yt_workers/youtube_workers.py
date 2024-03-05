@@ -16,22 +16,27 @@ r = redis.from_url(redis_uri)
 GAMES_QUEUE = "games:all"
 YT_CHANNELS_QUEUE = "channels:all"
 SPLATTERCAT_GAMES_NEXTPAGE_TOKEN = "next_page_token:splattercatgaming"
+WANDERBBOTS="next_page_token:wanderbots"
+BEARTAFFY = "next_page_token:BaerTaffy"
+NOOKRIUM = "next_page_token:Nookrium"
+RETROMATION = "next_page_token:Retromation"
 
 
-# GETS AND SAVES INDIE GAMES PLAYED BY SPLATTERCAT THE OG :)
-async def worker_get_all_games_by_splatter_cat():
-    channel_id = yt.get_channel_id_by_name("splattercatgaming")
+
+# GETS AND SAVES INDIE GAMES PLAYED BY SPLATTERCAT AND THER OGs :)
+async def worker_get_all_games_by_specific_youtbers(youtuber_redis_next_page_token : str):
+    channel_id = yt.get_channel_id_by_name(youtuber_redis_next_page_token.split(":")[1])
     # channel_id = yt.get_channel_id_by_name("wanderbots")
 
     # get the next page
-    token: ResponseT | None = r.get(SPLATTERCAT_GAMES_NEXTPAGE_TOKEN)
+    token: ResponseT | None = r.get(youtuber_redis_next_page_token)
     results, next_page_token = yt.most_popular_or_recent_video(
         channel_id, order=1, next_page_token=token
     )
     if next_page_token:
-        r.set(SPLATTERCAT_GAMES_NEXTPAGE_TOKEN, str(next_page_token))
+        r.set(youtuber_redis_next_page_token, str(next_page_token))
     else:
-        r.delete(SPLATTERCAT_GAMES_NEXTPAGE_TOKEN)
+        r.delete(youtuber_redis_next_page_token)
     video_ids: List[str] = [x[0] for x in results]
     games_played = map(yt.games_played_and_linked_details, video_ids)
     games_played = [video[0] for video in list(games_played) if video[0]]
@@ -282,7 +287,7 @@ async def channel_enumerator(channel_ids, Session:ClientSession, url:str, header
             channls_to_update_genres.append({"youtube_url":ch, "genres":genres[index]})
 
 loop = asyncio.get_event_loop()
-loop.run_until_complete(worker_get_all_games_by_splatter_cat())
+#loop.run_until_complete(worker_get_all_games_by_specific_youtbers(BEARTAFFY))
 loop.run_until_complete(worker_yt_search_for_indie_playing_channels())
 loop.run_until_complete(worker_yt_add_channels_to_db())
 # loop.run_until_complete(yt_worker_update_streamer_video_history())
